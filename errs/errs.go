@@ -5,15 +5,15 @@ import (
 	"mimose/gcosy/magic"
 )
 
-type NError struct {
+type CError struct {
 	Code int
 	Desc string
 	Err  error
 }
 
 // error message
-func (e *NError) Error() string {
-	errorMessage := "NError[code: %d]"
+func (e *CError) Error() string {
+	errorMessage := "CError[code: %d]"
 	if e.Desc != "" {
 		errorMessage += " [desc: %s]"
 	}
@@ -23,9 +23,9 @@ func (e *NError) Error() string {
 	return fmt.Sprintf(errorMessage, e.Code, e.Desc, magic.Ternary(e.Err != nil, e.Err.Error(), ""))
 }
 
-// new a NError
-func New(code int, desc string, err error) *NError {
-	return &NError{
+// new a CError
+func New(code int, desc string, err error) *CError {
+	return &CError{
 		Code: code,
 		Desc: desc,
 		Err:  err,
