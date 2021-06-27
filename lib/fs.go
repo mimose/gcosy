@@ -2,6 +2,7 @@ package lib
 
 import (
 	"bufio"
+	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -33,10 +34,7 @@ func Write(dirPath, fileName string, buf []byte, append bool) error {
 			return err
 		}
 	}
-	if !strings.HasPrefix(fileName, "\\") {
-		fileName = "\\" + fileName
-	}
-	fileObj, err := os.OpenFile(dirPath+fileName, fileFlag, 0644)
+	fileObj, err := os.OpenFile(CompletePath(dirPath, fileName), fileFlag, 0644)
 	if err == nil {
 		defer fileObj.Close()
 		writeObj := bufio.NewWriterSize(fileObj, 4096)
@@ -48,4 +46,26 @@ func Write(dirPath, fileName string, buf []byte, append bool) error {
 		return err
 	}
 	return err
+}
+
+func Read(filePath string) ([]byte, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	return ioutil.ReadAll(file)
+}
+
+func CompletePath(path ...string) string {
+	var fullPath string = path[0]
+	for i := range path {
+		if i > 0 {
+			thisPath := path[i]
+			if !strings.HasPrefix(thisPath, "\\") {
+				thisPath = "\\" + thisPath
+			}
+			fullPath = strings.Join([]string{fullPath, thisPath}, "")
+		}
+	}
+	return fullPath
 }
