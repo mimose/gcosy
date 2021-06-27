@@ -1,4 +1,4 @@
-package collect
+package lib
 
 func keys(m map[string]interface{}) []string {
 	var ks []string

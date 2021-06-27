@@ -1,8 +1,7 @@
-package errs
+package lib
 
 import (
 	"fmt"
-	"mimose/gcosy/magic"
 )
 
 type CError struct {
@@ -20,11 +19,11 @@ func (e *CError) Error() string {
 	if e.Err != nil {
 		errorMessage += " [oriError: %s]"
 	}
-	return fmt.Sprintf(errorMessage, e.Code, e.Desc, magic.Ternary(e.Err != nil, e.Err.Error(), ""))
+	return fmt.Sprintf(errorMessage, e.Code, e.Desc, Ternary(e.Err != nil, e.Err.Error(), ""))
 }
 
 // new a CError
-func New(code int, desc string, err error) *CError {
+func NewError(code int, desc string, err error) *CError {
 	return &CError{
 		Code: code,
 		Desc: desc,
