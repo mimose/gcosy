@@ -2,6 +2,7 @@ package lib
 
 import (
 	"bufio"
+	"errors"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -53,11 +54,32 @@ func Read(filePath string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer file.Close()
 	return ioutil.ReadAll(file)
 }
 
+func ReadDirAllFiles(dirPath string) ([][]byte, error) {
+	if !DirExists(dirPath) {
+		return nil, errors.New("dir is not exists")
+	}
+	files, err := ioutil.ReadDir(dirPath)
+	if err != nil {
+		return nil, err
+	}
+	//var filesContents []string
+	var fileBytes [][]byte
+	for _, file := range files {
+		byte, err := Read(CompletePath(dirPath, file.Name()))
+		if err != nil {
+			return nil, err
+		}
+		fileBytes = append(fileBytes, byte)
+	}
+	return fileBytes, nil
+}
+
 func CompletePath(path ...string) string {
-	var fullPath string = path[0]
+	var fullPath = path[0]
 	for i := range path {
 		if i > 0 {
 			thisPath := path[i]
