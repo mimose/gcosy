@@ -18,13 +18,15 @@ func (e *CError) Error() string {
 	}
 	if e.Err != nil {
 		errorMessage += " [oriError: %s]"
+		return fmt.Sprintf(errorMessage, e.Code, e.Desc, e.Err.Error())
 	}
-	return fmt.Sprintf(errorMessage, e.Code, e.Desc, Ternary(e.Err != nil, e.Err.Error(), ""))
+
+	return fmt.Sprintf(errorMessage, e.Code, e.Desc)
 }
 
 // new a CError
-func NewError(code int, desc string, err error) *CError {
-	return &CError{
+func NewError(code int, desc string, err error) CError {
+	return CError{
 		Code: code,
 		Desc: desc,
 		Err:  err,
