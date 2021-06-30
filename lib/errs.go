@@ -25,8 +25,8 @@ func (e *CError) Error() string {
 }
 
 // new a CError
-func NewError(code int, desc string, err error) CError {
-	return CError{
+func NewError(code int, desc string, err error) *CError {
+	return &CError{
 		Code: code,
 		Desc: desc,
 		Err:  err,
