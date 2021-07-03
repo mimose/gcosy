@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"syscall"
 )
 
 // FileExists returns true if the given file exists
@@ -31,11 +32,13 @@ func Write(dirPath, fileName string, buf []byte, append bool) error {
 		fileFlag = os.O_RDWR | os.O_CREATE | os.O_TRUNC
 	}
 	if !DirExists(dirPath) {
-		if err := os.MkdirAll(dirPath, 0644); err != nil {
+		oldMask := syscall.Umask(0)
+		defer syscall.Umask(oldMask)
+		if err := os.MkdirAll(dirPath, os.ModePerm); err != nil {
 			return err
 		}
 	}
-	fileObj, err := os.OpenFile(CompletePath(dirPath, fileName), fileFlag, 0644)
+	fileObj, err := os.OpenFile(CompletePath(dirPath, fileName), fileFlag, os.ModePerm)
 	if err == nil {
 		defer fileObj.Close()
 		writeObj := bufio.NewWriterSize(fileObj, 4096)
@@ -83,8 +86,8 @@ func CompletePath(path ...string) string {
 	for i := range path {
 		if i > 0 {
 			thisPath := path[i]
-			if !strings.HasPrefix(thisPath, "\\") {
-				thisPath = "\\" + thisPath
+			if !strings.HasPrefix(thisPath, "/") {
+				thisPath = "/" + thisPath
 			}
 			fullPath = strings.Join([]string{fullPath, thisPath}, "")
 		}
