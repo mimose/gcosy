@@ -24,7 +24,7 @@ func DirExists(dir string) bool {
 	return stat.IsDir()
 }
 
-func Write(dirPath, fileName string, buf []byte, append bool) error {
+func Write(dirPath, fileName string, buf []byte, append bool) (string, error) {
 	var fileFlag int
 	if append {
 		fileFlag = os.O_RDWR | os.O_CREATE | os.O_APPEND
@@ -35,10 +35,11 @@ func Write(dirPath, fileName string, buf []byte, append bool) error {
 		oldMask := syscall.Umask(0)
 		defer syscall.Umask(oldMask)
 		if err := os.MkdirAll(dirPath, os.ModePerm); err != nil {
-			return err
+			return "", err
 		}
 	}
-	fileObj, err := os.OpenFile(CompletePath(dirPath, fileName), fileFlag, os.ModePerm)
+	fileFullPath := CompletePath(dirPath, fileName)
+	fileObj, err := os.OpenFile(fileFullPath, fileFlag, os.ModePerm)
 	if err == nil {
 		defer fileObj.Close()
 		writeObj := bufio.NewWriterSize(fileObj, 4096)
@@ -47,9 +48,9 @@ func Write(dirPath, fileName string, buf []byte, append bool) error {
 		if err == nil {
 			err = writeObj.Flush()
 		}
-		return err
+		return fileFullPath, err
 	}
-	return err
+	return fileFullPath, err
 }
 
 func Read(filePath string) ([]byte, error) {
@@ -79,6 +80,10 @@ func ReadDirAllFiles(dirPath string) ([][]byte, error) {
 		fileBytes = append(fileBytes, byte)
 	}
 	return fileBytes, nil
+}
+
+func DeleteFile(filePath string) error {
+	return os.Remove(filePath)
 }
 
 func CompletePath(path ...string) string {
