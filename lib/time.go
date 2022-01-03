@@ -25,3 +25,7 @@ func (t CTime) MarshalJSON() ([]byte, error) {
 func (t CTime) String() string {
 	return time.Time(t).Format(TIME_FORMAT)
 }
+
+func CurrentTimeMilliseconds() int64 {
+	return time.Now().Unix()
+}
